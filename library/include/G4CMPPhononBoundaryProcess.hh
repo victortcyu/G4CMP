@@ -50,6 +50,11 @@ protected:
   virtual void DoReflection(const G4Track& aTrack, const G4Step& aStep,
 			    G4ParticleChange& aParticleChange);
 
+  // addition 6/2/25
+  virtual void DoTransmission(const G4Track& aTrack, const G4Step& aStep,
+      G4ParticleChange& aParticleChange);
+
+
   G4ThreeVector GetReflectedVector(const G4ThreeVector& waveVector, 
 				   const G4ThreeVector& surfNorm,
 				   G4int mode) const;
