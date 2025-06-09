@@ -47,6 +47,8 @@ protected:
   // Apply phonon-specific conditions, after calling through to base
   virtual G4bool AbsorbTrack(const G4Track& aTrack, const G4Step& aStep) const;
 
+  // addition 6/9/25, frequency-dependent reflectTrack
+  virtual G4bool ReflectTrack(const G4Track& aTrack, const G4Step& aStep) const;
   virtual void DoReflection(const G4Track& aTrack, const G4Step& aStep,
 			    G4ParticleChange& aParticleChange);
 

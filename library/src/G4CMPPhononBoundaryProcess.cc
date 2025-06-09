@@ -134,9 +134,6 @@ G4bool G4CMPPhononBoundaryProcess::AbsorbTrack(const G4Track& aTrack,
 void G4CMPPhononBoundaryProcess::
 DoTransmission(const G4Track& aTrack, const G4Step& aStep,
     G4ParticleChange& particleChange) {
-    G4cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << G4endl;
-    G4cout << "!!! MY CUSTOM G4CMPPhononBoundaryProcess::DoTransmission IS RUNNING !!!" << G4endl;
-    G4cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << G4endl;
 
     if (verboseLevel > 1) {
         G4String fromVolumeName = "UnknownVolume";
@@ -186,6 +183,23 @@ DoTransmission(const G4Track& aTrack, const G4Step& aStep,
     // which is fAlive, and the track continues with its current momentum and energy.
 }
 
+// Addition 6/9/25
+G4bool G4CMPPhononBoundaryProcess::
+ReflectTrack(const G4Track& aTrack, const G4Step& aStep) const {
+    G4double freq = GetKineticEnergy(aTrack) / h_Planck;	// E = hf, f = E/h
+
+    // NOTE: these probabilities must be normalized already
+    G4double specProb = surfProp->SpecularReflProb(freq);
+    G4double diffuseProb = surfProp->DiffuseReflProb(freq);
+    G4double downconversionProb = surfProp->AnharmonicReflProb(freq);
+
+    G4double totalProb = specProb + diffuseProb + downconversionProb;
+    if (verboseLevel > 2)
+        G4cout << " Reflection Probability: " << totalProb << G4endl;
+
+    return (G4UniformRand() <= totalProb);
+}
+
 
 void G4CMPPhononBoundaryProcess::
 DoReflection(const G4Track& aTrack, const G4Step& aStep,
@@ -223,6 +237,9 @@ DoReflection(const G4Track& aTrack, const G4Step& aStep,
 
   // Empirical functions may lead to non normalised probabilities.
   // Normalise here.
+
+  // 6/9/25: this normalization is required because our probabilities are
+  // normalized when including transmission, etc.
 
   G4double norm = specProb + diffuseProb + downconversionProb;
 
