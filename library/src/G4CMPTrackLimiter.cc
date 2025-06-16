@@ -16,6 +16,7 @@
 #include "G4CMPConfigManager.hh"
 #include "G4CMPUtils.hh"
 #include "G4ForceCondition.hh"
+#include "G4LatticeManager.hh"
 #include "G4ParticleChange.hh"
 #include "G4Step.hh"
 #include "G4Track.hh"
@@ -83,18 +84,21 @@ G4bool G4CMPTrackLimiter::BelowEnergyCut(const G4Track& track) const {
 }
 
 G4bool G4CMPTrackLimiter::EscapedFromVolume(const G4Step& step) const {
-  G4VPhysicalVolume* prePV  = step.GetPreStepPoint()->GetPhysicalVolume();
-  G4VPhysicalVolume* postPV = step.GetPostStepPoint()->GetPhysicalVolume();
+  /*G4VPhysicalVolume* postPV = step.GetPostStepPoint()->GetPhysicalVolume();
 
-  if (verboseLevel>2) {
-    G4cout << " prePV " << prePV->GetName()
-	   << " postPV " << (postPV?postPV->GetName():"OutOfWorld")
-	   << " status " << step.GetPostStepPoint()->GetStepStatus()
-	   << G4endl;
+  if (!postPV) {
+    return true;
   }
 
-  // Track is NOT at a boundary, is stepping outside volume, or already escaped
-  return ( (step.GetPostStepPoint()->GetStepStatus() != fGeomBoundary) &&
-	   (postPV != GetCurrentVolume() || prePV != GetCurrentVolume())
-	   );
+  G4LatticeManager* lm = G4LatticeManager::GetLatticeManager();
+  G4bool destinationHasLattice = (lm->GetLattice(postPV) != nullptr);
+
+  if (!destinationHasLattice) {
+      if (verboseLevel > 1) {
+          G4cout << "G4CMPTrackLimiter: Track entering non-lattice volume <"
+              << postPV->GetName() << ">. Killing track." << G4endl;
+      }
+      return true; 
+  }*/
+  return false;
 }
