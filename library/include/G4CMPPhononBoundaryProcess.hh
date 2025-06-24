@@ -56,12 +56,19 @@ protected:
   // Apply phonon-specific conditions, after calling through to base
   virtual G4bool AbsorbTrack(const G4Track& aTrack, const G4Step& aStep) const;
 
+  // addition 6/9/25, frequency-dependent reflectTrack
+  virtual G4bool ReflectTrack(const G4Track& aTrack, const G4Step& aStep) const;
   virtual void DoReflection(const G4Track& aTrack, const G4Step& aStep,
 			                      G4ParticleChange& aParticleChange);
 
   G4ThreeVector GetSpecularVector(const G4ThreeVector& waveVector,
                                   G4ThreeVector& surfNorm, G4int mode,
                                   G4ThreeVector& surfacePoint);
+           
+  // addition 6/2/25
+  virtual void DoTransmission(const G4Track& aTrack, const G4Step& aStep,
+      G4ParticleChange& aParticleChange);
+
 
   // Update navigator volume when position is changed
   void UpdateNavigatorVolume(const G4Step&, const G4ThreeVector& position,

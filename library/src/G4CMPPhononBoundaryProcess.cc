@@ -54,6 +54,7 @@
 #include "G4CMPUtils.hh"
 #include "G4ExceptionSeverity.hh"
 #include "G4GeometryTolerance.hh"
+#include "G4LatticeManager.hh"
 #include "G4LatticePhysical.hh"
 #include "G4Navigator.hh"
 #include "G4ParallelWorldProcess.hh"
@@ -164,6 +165,76 @@ G4bool G4CMPPhononBoundaryProcess::AbsorbTrack(const G4Track& aTrack,
 	  fabs(k*G4CMP::GetSurfaceNormal(aStep)) > absMinK);
 }
 
+// Addition 6/2/25
+void G4CMPPhononBoundaryProcess::
+DoTransmission(const G4Track& aTrack, const G4Step& aStep,
+    G4ParticleChange& particleChange) {
+
+    if (verboseLevel > 1) {
+        G4String fromVolumeName = "UnknownVolume";
+        if (prePV) {
+            fromVolumeName = prePV->GetName();
+        }
+        G4String toVolumeName = "OutOfWorld";
+        if (postPV) {
+            toVolumeName = postPV->GetName();
+        }
+        G4cout << GetProcessName() << ": Phonon proposed for transmission from "
+            << fromVolumeName << " to " << toVolumeName << G4endl;
+    }
+
+    G4bool killTrack = false;
+
+    if (!postPV) {
+        if (verboseLevel > 0) { 
+            G4cout << GetProcessName() << ": Phonon transmitting out of the world. Track will be killed." << G4endl;
+        }
+        killTrack = true;
+    }
+    else {
+        G4LatticePhysical* postLattice = G4LatticeManager::GetLatticeManager()->GetLattice(postPV);
+        if (!postLattice) {
+            if (verboseLevel > 0) { 
+                G4cout << GetProcessName() << ": Phonon transmitting into volume '" << postPV->GetName()
+                    << "' which has no G4CMP lattice defined. Track will be killed." << G4endl;
+            }
+            killTrack = true;
+        }
+        else {
+            if (verboseLevel > 1) {
+                G4cout << GetProcessName() << ": Phonon transmitting into G4CMP volume '" << postPV->GetName()
+                    << "'. Track continues with current properties." << G4endl;
+            }
+        }
+    }
+
+    if (killTrack) {
+        particleChange.ProposeTrackStatus(fStopAndKill);
+        // Optional: If you need to ensure energy is deposited or set to zero upon killing:
+        // particleChange.ProposeEnergy(0.);
+        // particleChange.ProposeNonIonizingEnergyDeposit(aTrack.GetKineticEnergy()); // Or similar logic
+    }
+    // If 'killTrack' is false, 'particleChange' retains its default proposal from Initialize(aTrack),
+    // which is fAlive, and the track continues with its current momentum and energy.
+}
+
+// Addition 6/9/25
+G4bool G4CMPPhononBoundaryProcess::
+ReflectTrack(const G4Track& aTrack, const G4Step& aStep) const {
+    G4double freq = GetKineticEnergy(aTrack) / h_Planck;	// E = hf, f = E/h
+
+    // NOTE: these probabilities must be normalized already
+    G4double specProb = surfProp->SpecularReflProb(freq);
+    G4double diffuseProb = surfProp->DiffuseReflProb(freq);
+    G4double downconversionProb = surfProp->AnharmonicReflProb(freq);
+
+    G4double totalProb = specProb + diffuseProb + downconversionProb;
+    if (verboseLevel > 2)
+        G4cout << " Reflection Probability: " << totalProb << G4endl;
+
+    return (G4UniformRand() <= totalProb);
+}
+
 
 void G4CMPPhononBoundaryProcess::
 DoReflection(const G4Track& aTrack, const G4Step& aStep,
@@ -201,6 +272,9 @@ DoReflection(const G4Track& aTrack, const G4Step& aStep,
 
   // Empirical functions may lead to non normalised probabilities.
   // Normalise here.
+
+  // 6/9/25: this normalization is required because our probabilities are
+  // normalized when including transmission, etc.
 
   G4double norm = specProb + diffuseProb + downconversionProb;
 

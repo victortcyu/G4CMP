@@ -20,6 +20,7 @@
 #include "G4CMPGeometryUtils.hh"
 #include "G4CMPUtils.hh"
 #include "G4ForceCondition.hh"
+#include "G4LatticeManager.hh"
 #include "G4ParticleChange.hh"
 #include "G4Step.hh"
 #include "G4Track.hh"
@@ -135,7 +136,7 @@ G4bool G4CMPTrackLimiter::InvalidPosition(const G4Track& track) const {
 }
 
 G4bool G4CMPTrackLimiter::EscapedFromVolume(const G4Step& step) const {
-    G4StepPoint* preS = step.GetPreStepPoint();
+/*    G4StepPoint* preS = step.GetPreStepPoint();
     G4StepPoint* postS = step.GetPostStepPoint();
 
   G4VPhysicalVolume* prePV  = step.GetPreStepPoint()->GetPhysicalVolume();
@@ -176,4 +177,6 @@ G4bool G4CMPTrackLimiter::EscapedFromVolume(const G4Step& step) const {
   if (verboseLevel>1) G4cout << " escape? " << escape << G4endl;
   
   return escape;
+}*/
+  return false;
 }
