@@ -2,7 +2,7 @@
 cubic 5.499 Ang        # Lattice constant (Vegard's law, okay)
 stiffness 1 1 154.9 GPa  # C11 elastic constant https://sites.utexas.edu/ruihuang/files/2021/03/JMPS04.pdf
 stiffness 1 2  59.5 GPa  # C12 elastic constant 
-stiffness 6 6  69.3 GPa  # C44 elastic constant 
+stiffness 4 4  69.3 GPa  # C44 elastic constant 
 
 # Phonon parameters (quasi-isotropic model), many suspicious values
 dyn -51.99 -87.39 47.96 64.43 GPa   # β, γ, λ, μ (interpolated, okay)
@@ -18,8 +18,8 @@ Debye 11.1 THz        # Debye cutoff frequency (interpolated, okay)
 bandgap 1.04 eV       # Bandgap with https://www.ioffe.ru/SVA/NSM/Semicond/SiGe/bandstr.html + Varshni
 pairEnergy 3.57 eV    # Average energy to create e–h pair (interpolated)
 fanoFactor 0.137      # Fano factor (interpolated)
-vsound 6930 m/s       # Longitudinal sound speed (using elasticity and mass density)
-vtrans 4630 m/s       # Transverse sound speed (using elasticity and mass density)
+vsound 6786 m/s       # Longitudinal sound speed (using elasticity and mass density)
+vtrans 4540 m/s       # Transverse sound speed (using elasticity and mass density)
 hmass 0.50            # same as Si
 emass 0.91 0.19 0.19  # same as Si
 valleyDir 1 0 0       # same as Si
